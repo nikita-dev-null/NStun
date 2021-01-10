@@ -20,7 +20,7 @@ stunClient.setSoftwareName("SoftwareName");
 // default - "StunClient"
 ```
 
-To install the server there is a method
+To set the server there is a method
 ```java
 stunClient.setServerAddress("stun.server.example");
 //default - "stun1.l.google.com"
