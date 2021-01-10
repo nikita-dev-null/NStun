@@ -30,3 +30,4 @@ To set the server port there is a method
 stunClient.setServerPort(3478);
 //default - 19392 for stun1.l.google.com 
 ```
+The current jar version is here https://github.com/nikita-dev-null/NStun/releases/tag/v0.1-alpha
