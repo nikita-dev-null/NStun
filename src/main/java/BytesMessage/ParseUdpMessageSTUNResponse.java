@@ -2,17 +2,21 @@ package BytesMessage;
 
 import java.math.BigInteger;
 
-public class ParseUdpMessageSTUNResponse {
+class ParseUdpMessageSTUNResponse {
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
+//    The magic cookie field MUST contain the fixed value 0x2112A442 in network byte order
+//    RFC 5389
     private static final String MAGIC_COOKIE = "2112A442";
     private static final String MAGIC_COOKIE_PORT = "2112";
 
     private final byte[] rawMessage;
 
-    public ParseUdpMessageSTUNResponse(byte[] rawMessage) {
+    ParseUdpMessageSTUNResponse(byte[] rawMessage) {
         this.rawMessage = rawMessage;
     }
-    public int[] getIPAddress() {
+
+    int[] getIPAddress() {
         int[] res = new int[4];
         byte[] rawAddress = new byte[]{rawMessage[28],rawMessage[29],rawMessage[30], rawMessage[31]};
         String hexAddress = bytesToHex(rawAddress);
@@ -23,7 +27,7 @@ public class ParseUdpMessageSTUNResponse {
         return res;
     }
 
-    public String getIPAddressAsString() {
+    String getIPAddressAsString() {
         String stringRes = "";
         byte[] rawAddress = new byte[]{rawMessage[28],rawMessage[29],rawMessage[30], rawMessage[31]};
         String hexAddress = bytesToHex(rawAddress);
@@ -39,7 +43,7 @@ public class ParseUdpMessageSTUNResponse {
         return stringRes+getPort();
     }
 
-    public int getPort() {
+    int getPort() {
         byte[] rawPort = new byte[]{rawMessage[26], rawMessage[27]};
         String hexPort = bytesToHex(rawPort);
         byte[] mappedPort = xorMappedAddress(hexPort, MAGIC_COOKIE_PORT);

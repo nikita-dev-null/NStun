@@ -187,6 +187,24 @@ public class STUN {
            System.out.print(b);
        }
     }
+
+    @Test
+    public void setAttributes_Software_Software() {
+        String software = "StunClient";
+        byte[] bytes = software.getBytes();
+        System.out.println(bytes.length);
+        for (byte b : bytes) {
+            System.out.print(b);
+        }
+    }
+
+    @Test
+    public void puddingTest() {
+        int len = 14;
+        int i = len % 4;
+        int resLen;
+        System.out.println(i);
+    }
 }
 
 //          Format of STUN Message Header

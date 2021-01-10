@@ -31,7 +31,7 @@ import java.util.zip.CRC32;
 //   to be less than 548 bytes (576 minus 20-byte IP header, minus 8-byte
 //   UDP header, assuming no IP options are used).
 
-public class UdpStunMessage {
+class UdpStunMessage {
 
 //    Message Type 0x0001 RFC 5389
     private final byte[] Message_Type_Binding_Request = new byte[]{(byte) 0, (byte) 1}; // 42 - 43 bytes
@@ -40,7 +40,6 @@ public class UdpStunMessage {
 //    RFC 5389
     private final byte[] Message_Magic_Cookie = new byte[]{(byte) 33, (byte) 18, (byte) 164, (byte) 66};
 
-
 //    The transaction ID is a 96-bit identifier
 //    RFC 5389
     private byte[] Message_Transaction_ID;
@@ -48,16 +47,40 @@ public class UdpStunMessage {
 
     //   the 32-bit value 0x5354554e RFC 5389
     private final String XOR_FINGERPRINT_RFC_VALUE = "5354554e";
-    private final byte[] Message_Length = new byte[]{(byte) 0, (byte)24};
+    private byte[] Message_Length;
     private final byte[] Attributes_Software_Type_Assignment = new byte[]{(byte) 128, (byte) 34};
-    private final byte[] Attributes_Software_Attribute_Length = new byte[]{(byte) 0, (byte) 12};
+    private byte[] Attributes_Software_Attribute_Length;
 
-//     It is a string "StunClient" in bytes array with length 12
-    private final byte[] Attributes_Software_Software = new byte[]{(byte) 83, (byte) 116, (byte) 117, (byte) 110, (byte) 67, (byte) 108, (byte) 105, (byte) 101, (byte) 110, (byte) 116, (byte) 0, (byte) 0};
+    private byte[] Attributes_Software_Software;
     private final byte[] Attributes_Fingerprint_Type_Assignment = new byte[]{(byte) 128, (byte) 40};
     private final byte[] Attributes_Fingerprint_Attribute_Length = new byte[]{(byte) 0, (byte) 4};
 
-    public byte[] createUdpMessage() {
+
+//    It MUST be a UTF-8 [RFC3629]
+//    encoded sequence of less than 128 characters (which can be as long as
+//    763 bytes).
+    void setAttributesSoftware(String software) {
+        byte[] bytes = software.getBytes();
+        byte [] softwareAttributes;
+        if (bytes.length % 4 != 0) {
+            softwareAttributes = new byte[bytes.length + 4 - bytes.length % 4];
+            System.arraycopy(bytes, 0, softwareAttributes, 0, bytes.length);
+            for (int i = bytes.length; i < softwareAttributes.length; i++) {
+                softwareAttributes[i] = (byte) 0;
+            }
+        } else {
+            softwareAttributes = new byte[bytes.length];
+            System.arraycopy(bytes, 0, softwareAttributes, 0, bytes.length);
+        }
+        Attributes_Software_Software = softwareAttributes;
+        Attributes_Software_Attribute_Length = new byte[]{0, (byte) softwareAttributes.length};
+        Message_Length = new byte[]{(byte) 0, (byte)(4 + softwareAttributes.length+ 8)};
+    }
+
+     byte[] createUdpMessage() {
+        if (Attributes_Software_Software == null) {
+            setAttributesSoftware("StunClient");
+        }
         generateTransactionID();
         byte[] res;
         res = concat(Message_Type_Binding_Request, Message_Length);
